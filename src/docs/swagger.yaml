@@ -1,0 +1,1655 @@
+definitions:
+  dto.ReqCreateUpdateEntry:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      project_id:
+        type: integer
+      tag_list:
+        items:
+          type: integer
+        type: array
+      time_end:
+        type: string
+      time_start:
+        type: string
+    required:
+    - time_end
+    - time_start
+    type: object
+  dto.ReqCreateUpdateGoal:
+    properties:
+      description:
+        type: string
+      hours_count:
+        type: number
+      id:
+        type: integer
+      name:
+        type: string
+      project_id:
+        type: integer
+      time_end:
+        type: string
+      time_start:
+        type: string
+    required:
+    - hours_count
+    - name
+    - project_id
+    - time_end
+    - time_start
+    type: object
+  dto.ReqCreateUpdateProject:
+    properties:
+      about:
+        type: string
+      color:
+        type: string
+      id:
+        type: integer
+      is_private:
+        type: boolean
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  dto.ReqCreateUpdateTag:
+    properties:
+      about:
+        type: string
+      color:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  dto.ReqUpdateUser:
+    properties:
+      about:
+        type: string
+      role:
+        type: integer
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.ReqUserSignIn:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.ReqUserSignUp:
+    properties:
+      about:
+        type: string
+      role:
+        type: integer
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  dto.RespEntry:
+    properties:
+      description:
+        type: string
+      duration:
+        type: string
+      id:
+        type: integer
+      project_id:
+        type: integer
+      tag_list:
+        items:
+          $ref: '#/definitions/models.Tag'
+        type: array
+      time_end:
+        type: string
+      time_start:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dto.RespGoal:
+    properties:
+      description:
+        type: string
+      hours_count:
+        type: number
+      id:
+        type: integer
+      name:
+        type: string
+      project_id:
+        type: integer
+      time_end:
+        type: string
+      time_start:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dto.RespProject:
+    properties:
+      about:
+        type: string
+      color:
+        type: string
+      id:
+        type: integer
+      is_private:
+        type: boolean
+      name:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dto.RespTag:
+    properties:
+      about:
+        type: string
+      color:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dto.RespUser:
+    properties:
+      about:
+        type: string
+      role:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  echo.HTTPError:
+    properties:
+      message: {}
+    type: object
+  models.Tag:
+    properties:
+      about:
+        type: string
+      color:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      userID:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      about:
+        type: string
+      role:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  pkg.Response:
+    properties:
+      body: {}
+    type: object
+info:
+  contact: {}
+paths:
+  /auth:
+    get:
+      description: check user auth
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success auth
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/models.User'
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Auth
+      tags:
+      - auth
+  /entry/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an entry
+      parameters:
+      - description: Entry ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: can't find entry with such id
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Delete an entry
+      tags:
+      - entry
+    get:
+      consumes:
+      - application/json
+      description: Get entry by id
+      parameters:
+      - description: Entry ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get entry
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespEntry'
+              type: object
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Show a post
+      tags:
+      - entry
+  /entry/create:
+    post:
+      consumes:
+      - application/json
+      description: Create entry
+      parameters:
+      - description: entry info
+        in: body
+        name: entry
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReqCreateUpdateEntry'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success update entry
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespEntry'
+              type: object
+        "400":
+          description: bad req
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf or permission denied
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "422":
+          description: unprocessable entity
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Create entry
+      tags:
+      - entry
+  /entry/edit:
+    post:
+      consumes:
+      - application/json
+      description: Update an entry
+      parameters:
+      - description: entry info
+        in: body
+        name: entry
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReqCreateUpdateEntry'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success update entry
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespEntry'
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf or permission denied
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "422":
+          description: unprocessable entity
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Update an entry
+      tags:
+      - entry
+  /friends/subscribe/{user_id}:
+    post:
+      description: subscribe
+      parameters:
+      - description: Friend ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: success subscribe
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: subscribe or user doesn't exist
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "409":
+          description: subscribe already exists
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: subscribe
+      tags:
+      - friends
+  /friends/unsubscribe/{user_id}:
+    delete:
+      description: Unsubscribe
+      parameters:
+      - description: Friend ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: success unsubscribe, body is empty
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: friend/user/friendship doesn't exist
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Unsubscribe
+      tags:
+      - friends
+  /goal/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a goal
+      parameters:
+      - description: Goal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: can't find goal with such id
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Delete a goal
+      tags:
+      - goal
+    get:
+      consumes:
+      - application/json
+      description: Get goal by id
+      parameters:
+      - description: Goal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get goal
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespGoal'
+              type: object
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Show a post
+      tags:
+      - goal
+  /goal/create:
+    post:
+      consumes:
+      - application/json
+      description: Create goal
+      parameters:
+      - description: goal info
+        in: body
+        name: goal
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReqCreateUpdateGoal'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success update goal
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespGoal'
+              type: object
+        "400":
+          description: bad req
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf or permission denied
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "422":
+          description: unprocessable entity
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Create goal
+      tags:
+      - goal
+  /goal/edit:
+    post:
+      consumes:
+      - application/json
+      description: Update a goal
+      parameters:
+      - description: goal info
+        in: body
+        name: goal
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReqCreateUpdateGoal'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success update goal
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespGoal'
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf or permission denied
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "422":
+          description: unprocessable entity
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Update a goal
+      tags:
+      - goal
+  /logout:
+    post:
+      description: user logout
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: success logout, body is empty
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Logout
+      tags:
+      - auth
+  /me:
+    get:
+      description: get info about me.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get users
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespUser'
+              type: object
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: get info about me.
+      tags:
+      - users
+  /me/edit:
+    put:
+      consumes:
+      - application/json
+      description: 'update user''s profile. Acl: user(owner account)'
+      parameters:
+      - description: user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReqUpdateUser'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: success update
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: can't find user with such id
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: UpdateUser
+      tags:
+      - users
+  /me/entries:
+    get:
+      description: Get user entries or get user entries for a day
+      parameters:
+      - description: day for events
+        in: query
+        name: day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get entries
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  items:
+                    $ref: '#/definitions/dto.RespEntry'
+                  type: array
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Get user entries
+      tags:
+      - entry
+  /me/friends:
+    get:
+      description: get my friends
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get profile
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  items:
+                    $ref: '#/definitions/dto.RespUser'
+                  type: array
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: user doesn't exist
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: get my friends
+      tags:
+      - friends
+  /me/goals:
+    get:
+      description: Get user goals or get user goals for a day
+      parameters:
+      - description: day for events
+        in: query
+        name: day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get goals
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  items:
+                    $ref: '#/definitions/dto.RespGoal'
+                  type: array
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Get user goals
+      tags:
+      - goal
+  /me/projects:
+    get:
+      description: Get user projects or get user projects for a day
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get projects
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  items:
+                    $ref: '#/definitions/dto.RespProject'
+                  type: array
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Get user projects
+      tags:
+      - project
+  /me/subs:
+    get:
+      description: get my subs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get profile
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  items:
+                    $ref: '#/definitions/dto.RespUser'
+                  type: array
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: user doesn't exist
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: get my subs
+      tags:
+      - friends
+  /me/tag:
+    get:
+      description: Get user tags
+      parameters:
+      - description: day for events
+        in: query
+        name: day
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get tags
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  items:
+                    $ref: '#/definitions/dto.RespTag'
+                  type: array
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Get user tags
+      tags:
+      - tag
+  /project/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an project
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: can't find project with such id
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Delete an project
+      tags:
+      - project
+    get:
+      consumes:
+      - application/json
+      description: Get project by id
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get project
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespProject'
+              type: object
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Show a post
+      tags:
+      - project
+  /project/create:
+    post:
+      consumes:
+      - application/json
+      description: Create project
+      parameters:
+      - description: project info
+        in: body
+        name: project
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReqCreateUpdateProject'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success update project
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespProject'
+              type: object
+        "400":
+          description: bad req
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf or permission denied
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "422":
+          description: unprocessable entity
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Create project
+      tags:
+      - project
+  /project/edit:
+    post:
+      consumes:
+      - application/json
+      description: Update an project
+      parameters:
+      - description: project info
+        in: body
+        name: project
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReqCreateUpdateProject'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success update project
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespProject'
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf or permission denied
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "422":
+          description: unprocessable entity
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Update an project
+      tags:
+      - project
+  /signin:
+    post:
+      consumes:
+      - application/json
+      description: user sign in
+      parameters:
+      - description: user info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReqUserSignIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success sign in
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespUser'
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: invalid password
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: user doesn't exist
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: SignIn
+      tags:
+      - auth
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: user sign up
+      parameters:
+      - description: user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReqUserSignUp'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: user created
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespUser'
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "409":
+          description: email already exists
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: SignUp
+      tags:
+      - auth
+  /tag/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an tag
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: can't find tag with such id
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Delete an tag
+      tags:
+      - tag
+    get:
+      consumes:
+      - application/json
+      description: Get tag by id
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get tag
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespTag'
+              type: object
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Show a post
+      tags:
+      - tag
+  /tag/create:
+    post:
+      consumes:
+      - application/json
+      description: Create tag
+      parameters:
+      - description: tag info
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReqCreateUpdateTag'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success update tag
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespTag'
+              type: object
+        "400":
+          description: bad req
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf or permission denied
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "422":
+          description: unprocessable entity
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Create tag
+      tags:
+      - tag
+  /tag/edit:
+    post:
+      consumes:
+      - application/json
+      description: Update an tag
+      parameters:
+      - description: tag info
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReqCreateUpdateTag'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success update tag
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespTag'
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "403":
+          description: invalid csrf or permission denied
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: invalid http method
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "422":
+          description: unprocessable entity
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Update an tag
+      tags:
+      - tag
+  /user/{user_id}/friends:
+    get:
+      description: get user friends
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get profile
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  items:
+                    $ref: '#/definitions/dto.RespUser'
+                  type: array
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: user doesn't exist
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: get user friends
+      tags:
+      - friends
+  /user/{user_id}/subs:
+    get:
+      description: get user subs
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get profile
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  items:
+                    $ref: '#/definitions/dto.RespUser'
+                  type: array
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: user doesn't exist
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: get user subs
+      tags:
+      - friends
+  /users:
+    get:
+      description: 'get all users. Acl: admin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get users
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  items:
+                    $ref: '#/definitions/dto.RespUser'
+                  type: array
+              type: object
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: GetUsers
+      tags:
+      - users
+  /users/{id}:
+    get:
+      description: get user's profile
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get user
+          schema:
+            allOf:
+            - $ref: '#/definitions/pkg.Response'
+            - properties:
+                body:
+                  $ref: '#/definitions/dto.RespUser'
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "401":
+          description: no cookie
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: can't find user with such id
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: GetProfile
+      tags:
+      - users
+swagger: "2.0"

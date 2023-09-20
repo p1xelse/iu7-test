@@ -1,0 +1,23 @@
+[logger]
+  header = 'time=${time_rfc3339} level=${level} prefix=${prefix} file=${short_file} line=${line} message:'
+  level = 2
+  log-http-format = 'time=${time_rfc3339} remote_ip=${remote_ip} `host=${host} method=${method} uri=${uri} user_agent=${user_agent} status=${status} error="${error}" bytes_in=${bytes_in} bytes_out=${bytes_out}\n'
+  log-file-path = './log/app.log'
+
+
+[postgres-client]
+    dsn = 'host=localhost user=test password=test database=postgres port=13081'
+    max-open-connections = 10
+    conn-lifetime = '3m0s'
+[server]
+    addr = ':8080'
+    read-timeout = '30s'
+    read-header-timeout = '30s'
+    write-timeout = '30s'
+[redis-client]
+    addr =':6379'
+    password = 'ws_redis_password'
+
+[redis-project-storage-client]
+    addr =':6380'
+    password = 'ws_redis_password'

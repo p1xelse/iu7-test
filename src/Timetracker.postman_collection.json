@@ -1,0 +1,2095 @@
+{
+	"info": {
+		"_postman_id": "1f2ec8df-2e33-4da6-a4f8-c77fe0b90da5",
+		"name": "Timetracker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26499397"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "AUTH|SIGNUP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"TestFields\", function () {",
+									"    var reqBody = JSON.parse(pm.request.body.raw);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.body.about).to.eql(reqBody.about);",
+									"    pm.expect(jsonData.body.email).to.eql(reqBody.email);",
+									"    pm.expect(jsonData.body.name).to.eql(reqBody.name);",
+									"",
+									"    pm.collectionVariables.set(\"cur_user\", jsonData.body.id)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"about\": \"string\",\n  \"email\": \"string\",\n  \"name\": \"string\",\n  \"password\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/signup",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "AUTH|SIGNUP test user 1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"about\": \"string\",\n  \"email\": \"string\",\n  \"name\": \"string\",\n  \"password\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/signup",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"signup"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "AUTH|SIGNUP test user 2",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"about\": \"string\",\n  \"email\": \"string1\",\n  \"name\": \"string\",\n  \"password\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/signup",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"signup"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "AUTH|SIGNUP admin",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"about\": \"string\",\n  \"role\": \"admin\",\n  \"email\": \"admin\",\n  \"name\": \"admin\",\n  \"password\": \"admin\",\n  \"admin_token\": \"secret_token\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/signup",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"signup"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "AUTH|SIGNIN",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"string\",\n  \"password\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/signin",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "AUTH|SIGNIN test user 1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"string\",\n  \"password\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/signin",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"signin"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "AUTH|SIGNIN test user 2",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"string1\",\n  \"password\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/signin",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"signin"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "AUTH|SIGNIN admin",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"admin\",\n  \"password\": \"admin\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/signin",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"signin"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "AUTH|auth",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"string\",\n  \"password\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/auth",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Project",
+			"item": [
+				{
+					"name": "PROJECT |CREATE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"TestFields\", function () {",
+									"    var reqBody = JSON.parse(pm.request.body.raw);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.body.about).to.eql(reqBody.about);",
+									"    pm.expect(jsonData.body.color).to.eql(reqBody.color);",
+									"    pm.expect(jsonData.body.is_private).to.eql(reqBody.is_private);",
+									"    pm.expect(jsonData.body.name).to.eql(reqBody.name);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"about\": \"string\",\n    \"color\": \"string\",\n    \"is_private\": false,\n    \"name\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/project/create",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"project",
+								"create"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "PROJECT |CREATE 1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"about\": \"About bmstu\",\n    \"color\": \"#FFFFFF\",\n    \"is_private\": true,\n    \"name\": \"study\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/project/create",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"project",
+										"create"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "PROJECT |CREATE 2",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"about\": \"my favorite\",\n    \"color\": \"green\",\n    \"is_private\": true,\n    \"name\": \"work\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/project/create",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"project",
+										"create"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "PROJECT|GET",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/project/1",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"project",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PROJECT|GET MY",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/me/projects",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"me",
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PROJECT|GET USERID",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const req = {",
+									"    url: pm.variables.get(\"baseurl\") + \"/signup\",",
+									"    method: 'POST',",
+									"    header: { 'content-type': 'application/json' },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({",
+									"                \"about\": \"string\",",
+									"                \"role\": \"admin\",",
+									"                \"email\": \"admin\",",
+									"                \"name\": \"admin\",",
+									"                \"password\": \"admin\",",
+									"                \"admin_token\": \"secret_token\"",
+									"})",
+									"",
+									"    }",
+									"};",
+									"",
+									"pm.sendRequest(req, function (err, res) {",
+									"    var jsonData = res.json();",
+									"    if (err) {",
+									"        console.log(err);",
+									"    }",
+									"    else {",
+									"        pm.expect(res).to.have.status(201)",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/user/{{cur_user}}/projects",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"user",
+								"{{cur_user}}",
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PROJECT|UPDATE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Your test name\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var reqBody = JSON.parse(pm.request.body.raw);",
+									"    pm.expect(jsonData.body.about).to.eql(reqBody.about);",
+									"    pm.expect(jsonData.body.color).to.eql(reqBody.color);",
+									"    pm.expect(jsonData.body.is_private).to.eql(reqBody.is_private);",
+									"    pm.expect(jsonData.body.name).to.eql(reqBody.name);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"about\": \"string1\",\n    \"color\": \"string\",\n    \"is_private\": true,\n    \"name\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/project/edit",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"project",
+								"edit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PROJECT|DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.sendRequest(pm.variables.get(\"baseurl\") + \"/project/1\", (error, response) => {",
+									"  if (error) {",
+									"    console.log(error);",
+									"  }",
+									"",
+									"  pm.test('get not found', () => {",
+									"    pm.expect(response).to.have.status(404)",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/project/1",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"project",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const req = {",
+							"    url: pm.variables.get(\"baseurl\") + \"/signin\",",
+							"    method: 'POST',",
+							"    header: { 'content-type': 'application/json' },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"                \"email\": \"string\",",
+							"                \"password\": \"string\"",
+							"                })",
+							"",
+							"    }",
+							"};",
+							"",
+							"pm.sendRequest(req, function (err, res) {",
+							"    var jsonData = res.json();",
+							"    if (err) {",
+							"        console.log(err);",
+							"    }",
+							"    else {",
+							"        pm.expect(res).to.have.status(200)",
+							"    }",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Entry",
+			"item": [
+				{
+					"name": "ENTRY|CREATE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"TestCreate\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.body.project_id).to.eql(null);",
+									"    pm.expect(jsonData.body.description).to.eql(\"work\");",
+									"    pm.expect(jsonData.body.time_end).to.eql(\"2018-09-22T13:42:31Z\");",
+									"    pm.expect(jsonData.body.time_start).to.eql(\"2018-09-23T12:42:31Z\");",
+									"    pm.expect(jsonData.body.tag_list).to.eql([]);",
+									"    pm.expect(jsonData.body.duration).to.eq(\"-23h0m0s\")",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"work\",\n    \"time_end\": \"2018-09-22T13:42:31Z\",\n    \"time_start\": \"2018-09-23T12:42:31Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/entry/create",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"entry",
+								"create"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "ENTRY|CREATE without project",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description\": \"work\",\n    \"time_end\": \"2018-09-23T13:45:31Z\",\n    \"time_start\": \"2018-09-23T12:42:31Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/entry/create",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"entry",
+										"create"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "ENTRY|CREATE with project",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description\": \"work\",\n    \"time_end\": \"2018-09-23T13:42:31Z\",\n    \"time_start\": \"2018-09-21T13:42:31Z\",\n    \"project_id\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/entry/create",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"entry",
+										"create"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "ENTRY|GET",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"work\",\n    \"time_end\": \"2018-09-22T13:42:31Z\",\n    \"time_start\": \"2018-09-23T12:42:31Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/entry/1",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"entry",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ENTRY|GET MY",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"work\",\n    \"time_end\": \"2018-09-22T13:42:31Z\",\n    \"time_start\": \"2018-09-23T12:42:31Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/me/entries",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"me",
+								"entries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ENTRY|GET MY DAY",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"work\",\n    \"time_end\": \"2018-09-22T13:42:31Z\",\n    \"time_start\": \"2018-09-23T12:42:31Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/me/entries?day=2018-09-23",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"me",
+								"entries"
+							],
+							"query": [
+								{
+									"key": "day",
+									"value": "2018-09-23"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ENTRY|UPDATE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = {",
+									"        \"id\": 1,",
+									"        \"user_id\": 1,",
+									"        \"project_id\": null,",
+									"        \"description\": \"hello\",",
+									"        \"tag_list\": [],",
+									"        \"time_start\": \"2018-09-23T12:42:31Z\",",
+									"        \"time_end\": \"2018-09-24T13:42:31Z\",",
+									"        \"duration\": \"25h0m0s\"",
+									"    }",
+									"pm.test(\"Your test name\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.body.time_start).to.eql(data.time_start);",
+									"    pm.expect(jsonData.body.time_end).to.eql(data.time_end);",
+									"    pm.expect(jsonData.body.duration).to.eql(data.duration);",
+									"    pm.expect(jsonData.body.description).to.eql(data.description);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"project_id\": null,\n    \"description\": \"hello\",\n    \"tag_list\": [],\n    \"time_start\": \"2018-09-23T12:42:31Z\",\n    \"time_end\": \"2018-09-24T13:42:31Z\",\n    \"duration\": \"-23h0m0s\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/entry/edit",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"entry",
+								"edit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ENTRY|DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.sendRequest(pm.variables.get(\"baseurl\") + \"/entry/1\", function (err, response) {",
+									"    ",
+									"});",
+									"",
+									"pm.sendRequest(pm.variables.get(\"baseurl\") + \"/entry/1\", (error, response) => {",
+									"  if (error) {",
+									"    console.log(error);",
+									"  }",
+									"",
+									"  pm.test('get not found', () => {",
+									"    pm.expect(response).to.have.status(404)",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"work\",\n    \"time_end\": \"2018-09-22T13:42:31Z\",\n    \"time_start\": \"2018-09-23T12:42:31Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/entry/1",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"entry",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const req = {",
+							"    url: pm.variables.get(\"baseurl\") + \"/signin\",",
+							"    method: 'POST',",
+							"    header: { 'content-type': 'application/json' },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"                \"email\": \"string\",",
+							"                \"password\": \"string\"",
+							"                })",
+							"",
+							"    }",
+							"};",
+							"",
+							"pm.sendRequest(req, function (err, res) {",
+							"    var jsonData = res.json();",
+							"    if (err) {",
+							"        console.log(err);",
+							"    }",
+							"    else {",
+							"        pm.expect(res).to.have.status(200)",
+							"    }",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Goal",
+			"item": [
+				{
+					"name": "GOAL |CREATE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"TestFields\", function () {",
+									"    var reqBody = JSON.parse(pm.request.body.raw);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.body.project_id).to.eql(reqBody.project_id);",
+									"    pm.expect(jsonData.body.description).to.eql(reqBody.description);",
+									"    pm.expect(jsonData.body.time_end).to.eql(reqBody.time_end);",
+									"    pm.expect(jsonData.body.time_start).to.eql(reqBody.time_start);",
+									"    pm.expect(jsonData.body.hours_count).to.eql(reqBody.hours_count);",
+									"    pm.expect(jsonData.body.name).to.eql(reqBody.name);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const req = {",
+									"    url: pm.variables.get(\"baseurl\") + \"/project/create\",",
+									"    method: 'POST',",
+									"    header: { 'content-type': 'application/json' },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({",
+									"                    \"about\": \"string\",",
+									"                    \"color\": \"string\",",
+									"                    \"is_private\": true,",
+									"                    \"name\": \"string\"",
+									"                    })",
+									"",
+									"    }",
+									"};",
+									"",
+									"pm.sendRequest(req, function (err, res) {",
+									"    var jsonData = res.json();",
+									"    if (err) {",
+									"        console.log(err);",
+									"    }",
+									"    else {",
+									"        pm.collectionVariables.set(\"exist_project_id\", res.json().body.id)",
+									"        pm.expect(res).to.have.status(200)",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"project_id\": {{exist_project_id}},\n    \"description\": \"string\",\n    \"hours_count\": 3,\n    \"name\": \"string\",\n    \"time_end\": \"2023-05-19T13:42:31Z\",\n    \"time_start\": \"2023-05-09T13:42:31Z\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/goal/create",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"goal",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GOAL|GET",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = {",
+									"    \"description\": \"string\",",
+									"    \"hours_count\": 3,",
+									"    \"name\": \"string\",",
+									"    \"time_end\": \"2023-05-19T13:42:31Z\",",
+									"    \"time_start\": \"2023-05-09T13:42:31Z\"",
+									"}",
+									"",
+									"pm.test(\"Test get\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.body.time_start).to.eql(data.time_start);",
+									"    pm.expect(jsonData.body.time_end).to.eql(data.time_end);",
+									"    pm.expect(jsonData.body.hours_count).to.eql(data.hours_count);",
+									"    pm.expect(jsonData.body.description).to.eql(data.description);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/goal/1",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"goal",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GOAL|GET MY",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"work\",\n    \"time_end\": \"2018-09-22T13:42:31Z\",\n    \"time_start\": \"2018-09-23T12:42:31Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/me/goals",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"me",
+								"goals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GOAL|UPDATE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Your test name\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var reqBody = JSON.parse(pm.request.body.raw);",
+									"    pm.expect(jsonData.body.time_start).to.eql(reqBody.time_start);",
+									"    pm.expect(jsonData.body.time_end).to.eql(reqBody.time_end);",
+									"    pm.expect(jsonData.body.duration).to.eql(reqBody.duration);",
+									"    pm.expect(jsonData.body.description).to.eql(reqBody.description);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"project_id\": {{exist_project_id}},\n    \"description\": \"string\",\n    \"hours_count\": 5,\n    \"name\": \"string\",\n    \"time_end\": \"2023-05-19T13:42:31Z\",\n    \"time_start\": \"2023-05-09T13:42:31Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/goal/edit",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"goal",
+								"edit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GOAL|DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.sendRequest(pm.variables.get(\"baseurl\") + \"/goal/1\", function (err, response) {",
+									"    ",
+									"});",
+									"",
+									"pm.sendRequest(pm.variables.get(\"baseurl\") + \"/goal/1\", (error, response) => {",
+									"  if (error) {",
+									"    console.log(error);",
+									"  }",
+									"",
+									"  pm.test('get not found', () => {",
+									"    pm.expect(response).to.have.status(404)",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"work\",\n    \"time_end\": \"2018-09-22T13:42:31Z\",\n    \"time_start\": \"2018-09-23T12:42:31Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/goal/1",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"goal",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const req = {",
+							"    url: pm.variables.get(\"baseurl\") + \"/signin\",",
+							"    method: 'POST',",
+							"    header: { 'content-type': 'application/json' },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"                \"email\": \"string\",",
+							"                \"password\": \"string\"",
+							"                })",
+							"",
+							"    }",
+							"};",
+							"",
+							"pm.sendRequest(req, function (err, res) {",
+							"    var jsonData = res.json();",
+							"    if (err) {",
+							"        console.log(err);",
+							"    }",
+							"    else {",
+							"        pm.expect(res).to.have.status(200)",
+							"    }",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Tag",
+			"item": [
+				{
+					"name": "TAG |CREATE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"TestFields\", function () {",
+									"    var reqBody = JSON.parse(pm.request.body.raw);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.body.about).to.eql(reqBody.about);",
+									"    pm.expect(jsonData.body.color).to.eql(reqBody.color);",
+									"    pm.expect(jsonData.body.name).to.eql(reqBody.name);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"about\": \"mytag\",\n    \"color\": \"#FFFFFF\",\n    \"name\": \"work\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/tag/create",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"tag",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TAG|GET",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = {",
+									"    \"about\": \"mytag\",",
+									"    \"color\": \"#FFFFFF\",",
+									"    \"name\": \"work\",",
+									"}",
+									"",
+									"pm.test(\"Test get\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.body.about).to.eql(data.about);",
+									"    pm.expect(jsonData.body.color).to.eql(data.color);",
+									"    pm.expect(jsonData.body.name).to.eql(data.name);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/tag/1",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"tag",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TAG|GET USR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/me/tags",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"me",
+								"tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TAG|UPDATE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Your test name\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var reqBody = JSON.parse(pm.request.body.raw);",
+									"    pm.expect(jsonData.body.about).to.eql(reqBody.about);",
+									"    pm.expect(jsonData.body.color).to.eql(reqBody.color);",
+									"    pm.expect(jsonData.body.is_private).to.eql(reqBody.is_private);",
+									"    pm.expect(jsonData.body.name).to.eql(reqBody.name);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"about\": \"string1\",\n    \"color\": \"string\",\n    \"name\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/tag/edit",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"tag",
+								"edit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TAG|DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.sendRequest(pm.variables.get(\"baseurl\") + \"/tag/1\", (error, response) => {",
+									"  if (error) {",
+									"    console.log(error);",
+									"  }",
+									"",
+									"  pm.test('get not found', () => {",
+									"    pm.expect(response).to.have.status(404)",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"work\",\n    \"time_end\": \"2018-09-22T13:42:31Z\",\n    \"time_start\": \"2018-09-23T12:42:31Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/tag/1",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"tag",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const req = {",
+							"    url: pm.variables.get(\"baseurl\") + \"/signin\",",
+							"    method: 'POST',",
+							"    header: { 'content-type': 'application/json' },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"                \"email\": \"string\",",
+							"                \"password\": \"string\"",
+							"                })",
+							"",
+							"    }",
+							"};",
+							"",
+							"pm.sendRequest(req, function (err, res) {",
+							"    var jsonData = res.json();",
+							"    if (err) {",
+							"        console.log(err);",
+							"    }",
+							"    else {",
+							"        pm.expect(res).to.have.status(200)",
+							"    }",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "USERS| /me/edit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"about\": \"string4\",\n  \"email\": \"string\",\n  \"name\": \"string\",\n  \"password\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/me/edit",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"me",
+								"edit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "USERS | GET BY ID",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.test.skip(\"Status code success\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/users/1",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "USERS | GET all",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test.skip(\"Status code success\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/users",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "USERS | GET ME",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/me",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const req = {",
+							"    url: pm.variables.get(\"baseurl\") + \"/signin\",",
+							"    method: 'POST',",
+							"    header: { 'content-type': 'application/json' },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"                \"email\": \"string\",",
+							"                \"password\": \"string\"",
+							"                })",
+							"",
+							"    }",
+							"};",
+							"",
+							"pm.sendRequest(req, function (err, res) {",
+							"    var jsonData = res.json();",
+							"    if (err) {",
+							"        console.log(err);",
+							"    }",
+							"    else {",
+							"        pm.expect(res).to.have.status(200)",
+							"    }",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Friends",
+			"item": [
+				{
+					"name": "FRIENDS | subscribe",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test.skip(\"Status code success\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"about\": \"string4\",\n  \"email\": \"string\",\n  \"name\": \"string\",\n  \"password\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/friends/subscribe/2",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"friends",
+								"subscribe",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FRIENDS | unsub",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test.skip(\"Status code success\")"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"about\": \"string4\",\n  \"email\": \"string\",\n  \"name\": \"string\",\n  \"password\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/friends/unsubscribe/3",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"friends",
+								"unsubscribe",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FRIENDS | me get subs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"about\": \"string4\",\n  \"email\": \"string\",\n  \"name\": \"string\",\n  \"password\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/me/subs",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"me",
+								"subs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FRIENDS | me get friends",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"about\": \"string4\",\n  \"email\": \"string\",\n  \"name\": \"string\",\n  \"password\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/me/friends",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"me",
+								"friends"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"if (pm.info.requestName !== \"FRIENDS | subscribe\" && ",
+					"    pm.info.requestName !== \"FRIENDS | unsub\" && ",
+					"    pm.info.requestName !== \"USERS | GET all\" &&",
+					"    pm.info.requestName !== \"USERS | GET BY ID\"",
+					") {",
+					"    pm.test(\"Status code success\", function () {",
+					"        pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
+					"    })",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseurl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "exist_project_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "cur_user",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
