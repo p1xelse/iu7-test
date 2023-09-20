@@ -1,0 +1,48 @@
+version: "3.5"
+services:
+  test_postgres:
+    image: "postgres:latest"
+    container_name: test_postgres
+    ports:
+      - "13081:5432"
+    volumes:
+      - ./dev/SQL:/docker-entrypoint-initdb.d/
+      # - ./gen:/home/gen/
+      # - ./config_postgres.conf:/etc/postgresql.conf
+      - ./dev/log:/var/log/
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: test
+    networks:
+      - mynetwork
+
+  redis-session:
+    image: redis:latest
+    command: --requirepass "ws_redis_password"
+    ports:
+      - "6379:6379"
+    networks:
+      - mynetwork
+
+  redis-cache:
+    image: redis:latest
+    command: --requirepass "ws_redis_password"
+    ports:
+      - "6380:6379"
+    networks:
+      - mynetwork
+  # app:
+  #   build: .
+  #   container_name: app
+  #   restart: always
+  #   depends_on: 
+  #     - test_postgres
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - mynetwork
+
+
+networks:
+  mynetwork:
