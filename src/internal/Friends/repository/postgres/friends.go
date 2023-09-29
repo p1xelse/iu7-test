@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"fmt"
 	"timetracker/internal/Friends/repository"
 	"timetracker/models"
 
@@ -60,7 +59,6 @@ func (fr friendRepository) CreateFriendRelation(t *models.FriendRelation) error 
 
 func (fr friendRepository) CheckFriends(t *models.FriendRelation) (bool, error) {
 	postgresFriend := toPostgresFriendRelation(t)
-	fmt.Println("postgresFriend: ", *postgresFriend.SubscriberID, "   ", *postgresFriend.UserID)
 	tx := fr.db.Where(postgresFriend).Take(&FriendRelation{})
 
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -85,13 +83,17 @@ func (fr friendRepository) DeleteFriendRelation(friendRel *models.FriendRelation
 
 func (fr friendRepository) GetUserSubs(userID uint64) ([]uint64, error) {
 	userIDs := make([]uint64, 0, 10)
+	fRel := []models.FriendRelation{}
 	tx := fr.db.Table(FriendRelation{}.TableName()+" f1").
 		Select("f1.subscriber_id").
 		Joins("left join friend_relation f2 on f2.user_id = f1.subscriber_id and f2.subscriber_id = f1.user_id").
-		Where("f1.user_id = ? and f2.user_id is null", userID).Find(&FriendRelation{}).Pluck("subscriber_id", &userIDs)
-
+		Where("f1.user_id = ? and f2.user_id is null", userID).Find(&fRel)
 	if tx.Error != nil {
 		return nil, errors.Wrap(tx.Error, "database error (table friend_relation)")
+	}
+
+	for idx := range fRel {
+		userIDs = append(userIDs, *fRel[idx].SubscriberID)
 	}
 
 	return userIDs, nil
@@ -99,13 +101,18 @@ func (fr friendRepository) GetUserSubs(userID uint64) ([]uint64, error) {
 
 func (fr friendRepository) GetUserFriends(userID uint64) ([]uint64, error) {
 	userIDs := make([]uint64, 0, 10)
+	fRel := []models.FriendRelation{}
 	tx := fr.db.Table(FriendRelation{}.TableName()+" f1").
 		Select("f1.subscriber_id").
 		Joins("join friend_relation f2 on f2.user_id = f1.subscriber_id and f2.subscriber_id = f1.user_id").
-		Where("f1.user_id = ?", userID).Find(&FriendRelation{}).Pluck("subscriber_id", &userIDs)
+		Where("f1.user_id = ?", userID).Find(&fRel)
 
 	if tx.Error != nil {
 		return nil, errors.Wrap(tx.Error, "database error (table friend_relation)")
+	}
+
+	for idx := range fRel {
+		userIDs = append(userIDs, *fRel[idx].SubscriberID)
 	}
 
 	return userIDs, nil

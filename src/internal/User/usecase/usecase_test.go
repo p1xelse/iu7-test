@@ -1,94 +1,96 @@
-package usecase_test
+package usecase
 
 import (
-	"github.com/bxcodec/faker"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"testing"
-	userMocks "timetracker/internal/User/repository/mocks"
-	"timetracker/internal/User/usecase"
+
+	userRepoMock "timetracker/internal/User/repository/mocks"
+	"timetracker/internal/testutils"
 	"timetracker/models"
+
+	"github.com/bxcodec/faker"
+	"github.com/ozontech/allure-go/pkg/framework/provider"
+	"github.com/ozontech/allure-go/pkg/framework/suite"
 )
 
-type TestCaseGetUser struct {
-	ArgData     uint64
-	ExpectedRes *models.User
-	Error       error
+type UserTestSuite struct {
+	suite.Suite
+	uc           UsecaseI
+	userRepoMock *userRepoMock.RepositoryI
+	userBuilder  *testutils.UserBuilder
 }
 
-type TestCaseCreateUpdateUser struct {
-	ArgData *models.User
-	Error   error
+func TestUserTestSuite(t *testing.T) {
+	suite.RunSuite(t, new(UserTestSuite))
 }
 
-func TestUsecaseGetUser(t *testing.T) {
-	var mockUserRes models.User
-	err := faker.FakeData(&mockUserRes)
-	assert.NoError(t, err)
-	mockUserRes.Password = ""
+func (s *UserTestSuite) BeforeEach(t provider.T) {
+	s.userRepoMock = userRepoMock.NewRepositoryI(t)
+	s.uc = New(s.userRepoMock)
+	s.userBuilder = testutils.NewUserBuilder()
+}
 
-	mockExpectedUser := mockUserRes
+func (s *UserTestSuite) TestUpdateUser(t provider.T) {
+	user := s.userBuilder.WithID(1).WithName("user").Build()
+	notFoundUser := s.userBuilder.WithID(0).Build()
 
-	mockUserRepo := userMocks.NewRepositoryI(t)
+	s.userRepoMock.On("GetUser", user.ID).Return(&user, nil)
+	s.userRepoMock.On("UpdateUser", &user).Return(nil)
+	s.userRepoMock.On("GetUser", notFoundUser.ID).Return(nil, models.ErrNotFound)
 
-	mockUserRepo.On("GetUser", mockUserRes.ID).Return(&mockUserRes, nil)
-
-	useCase := usecase.New(mockUserRepo)
-
-	cases := map[string]TestCaseGetUser{
+	cases := map[string]struct {
+		ArgData *models.User
+		Error   error
+	}{
 		"success": {
-			ArgData:     mockUserRes.ID,
-			ExpectedRes: &mockExpectedUser,
-			Error:       nil,
-		},
-	}
-
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			user, err := useCase.GetUser(test.ArgData)
-			require.Equal(t, test.Error, err)
-
-			if err == nil {
-				assert.Equal(t, test.ExpectedRes, user)
-			}
-		})
-	}
-	mockUserRepo.AssertExpectations(t)
-}
-
-func TestUsecaseUpdateUser(t *testing.T) {
-	var mockUser, invalidMockUser models.User
-	err := faker.FakeData(&mockUser)
-	assert.NoError(t, err)
-
-	invalidMockUser.ID += mockUser.ID + 1
-
-	mockUserRepo := userMocks.NewRepositoryI(t)
-
-	mockUserRepo.On("GetUser", mockUser.ID).Return(&mockUser, nil)
-	mockUserRepo.On("UpdateUser", &mockUser).Return(nil)
-
-	mockUserRepo.On("GetUser", invalidMockUser.ID).Return(nil, models.ErrNotFound)
-
-	useCase := usecase.New(mockUserRepo)
-
-	cases := map[string]TestCaseCreateUpdateUser{
-		"success": {
-			ArgData: &mockUser,
+			ArgData: &user,
 			Error:   nil,
 		},
-		"User not found": {
-			ArgData: &invalidMockUser,
+		"user not found": {
+			ArgData: &notFoundUser,
 			Error:   models.ErrNotFound,
 		},
 	}
 
 	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			err := useCase.UpdateUser(test.ArgData)
-			require.Equal(t, test.Error, errors.Cause(err))
+		t.Run(name, func(t provider.T) {
+			err := s.uc.UpdateUser(test.ArgData)
+			t.Assert().ErrorIs(err, test.Error)
 		})
 	}
-	mockUserRepo.AssertExpectations(t)
+}
+
+func (s *UserTestSuite) TestGetUser(t provider.T) {
+	user := s.userBuilder.WithID(1).WithName("user").Build()
+
+	s.userRepoMock.On("GetUser", user.ID).Return(&user, nil)
+	result, err := s.uc.GetUser(user.ID)
+
+	t.Assert().NoError(err)
+	t.Assert().Equal(user, *result)
+}
+
+func (s *UserTestSuite) TestUsecaseGetUsers(t provider.T) {
+	users := make([]*models.User, 0, 10)
+	err := faker.FakeData(&users)
+	t.Assert().NoError(err)
+
+	s.userRepoMock.On("GetUsers").Return(users, nil)
+
+	cases := map[string]struct {
+		Users []*models.User
+		Error error
+	}{
+		"success": {
+			Users: users,
+			Error: nil,
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, func(t provider.T) {
+			resUsers, err := s.uc.GetUsers()
+			t.Assert().ErrorIs(err, test.Error)
+			t.Assert().Equal(test.Users, resUsers)
+		})
+	}
 }

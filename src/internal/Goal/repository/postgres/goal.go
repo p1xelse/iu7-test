@@ -1,11 +1,12 @@
 package postgres
 
 import (
-	"github.com/pkg/errors"
-	"gorm.io/gorm"
 	"time"
 	"timetracker/internal/Goal/repository"
 	"timetracker/models"
+
+	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 type Goal struct {
@@ -21,6 +22,10 @@ type Goal struct {
 
 func (Goal) TableName() string {
 	return "goal"
+}
+
+func (Goal) columns() []string {
+	return []string{"id", "user_id", "name", "project_id", "description", "time_start", "time_end", "hours_count"}
 }
 
 func toPostgresGoal(g *models.Goal) *Goal {

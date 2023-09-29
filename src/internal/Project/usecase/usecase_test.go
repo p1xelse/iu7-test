@@ -1,206 +1,143 @@
-package usecase_test
+package usecase
 
 import (
-	"github.com/bxcodec/faker"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"testing"
-	goalMocks "timetracker/internal/Project/repository/mocks"
-	"timetracker/internal/Project/usecase"
+
+	projectRepoMock "timetracker/internal/Project/repository/mocks"
+	"timetracker/internal/testutils"
 	"timetracker/models"
+
+	"github.com/bxcodec/faker"
+	"github.com/ozontech/allure-go/pkg/framework/provider"
+	"github.com/ozontech/allure-go/pkg/framework/suite"
 )
 
-type TestCaseGetProject struct {
-	ArgData     uint64
-	ExpectedRes *models.Project
-	Error       error
+type ProjectTestSuite struct {
+	suite.Suite
+	uc             UsecaseI
+	prRepoMock     *projectRepoMock.RepositoryI
+	projectBuilder *testutils.ProjectBuilder
 }
 
-type TestCaseDeleteProject struct {
-	ArgData []*uint64
-	Error   error
+func TestProjectTestSuite(t *testing.T) {
+	suite.RunSuite(t, new(ProjectTestSuite))
 }
 
-type TestCaseCreateUpdateProject struct {
-	ArgData *models.Project
-	Error   error
+func (s *ProjectTestSuite) BeforeEach(t provider.T) {
+	s.prRepoMock = projectRepoMock.NewRepositoryI(t)
+	s.uc = New(s.prRepoMock, nil)
+	s.projectBuilder = testutils.NewProjectBuilder()
 }
 
-type TestCaseGetUserProjects struct {
-	ArgData     *uint64
-	ExpectedRes []*models.Project
-	Error       error
+func (s *ProjectTestSuite) TestCreateProject(t provider.T) {
+	project := s.projectBuilder.WithID(1).WithName("project").Build()
+
+	s.prRepoMock.On("CreateProject", &project).Return(nil)
+	err := s.uc.CreateProject(&project)
+
+	t.Assert().NoError(err)
 }
 
-func TestUsecaseGetProject(t *testing.T) {
-	var mockProjectRes models.Project
-	err := faker.FakeData(&mockProjectRes)
-	assert.NoError(t, err)
+func (s *ProjectTestSuite) TestUpdateProject(t provider.T) {
+	project := s.projectBuilder.WithID(1).WithName("project").Build()
+	notFoundProject := s.projectBuilder.WithID(0).Build()
 
-	mockExpectedProject := mockProjectRes
+	s.prRepoMock.On("GetProject", project.ID).Return(&project, nil)
+	s.prRepoMock.On("UpdateProject", &project).Return(nil)
+	s.prRepoMock.On("GetProject", notFoundProject.ID).Return(nil, models.ErrNotFound)
 
-	mockProjectRepo := goalMocks.NewRepositoryI(t)
-
-	mockProjectRepo.On("GetProject", mockProjectRes.ID).Return(&mockProjectRes, nil)
-
-	useCase := usecase.New(mockProjectRepo, nil)
-
-	cases := map[string]TestCaseGetProject{
+	cases := map[string]struct {
+		ArgData *models.Project
+		Error   error
+	}{
 		"success": {
-			ArgData:     mockProjectRes.ID,
-			ExpectedRes: &mockExpectedProject,
-			Error:       nil,
-		},
-	}
-
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			user, err := useCase.GetProject(test.ArgData)
-			require.Equal(t, test.Error, err)
-
-			if err == nil {
-				assert.Equal(t, test.ExpectedRes, user)
-			}
-		})
-	}
-	mockProjectRepo.AssertExpectations(t)
-}
-
-func TestUsecaseUpdateProject(t *testing.T) {
-	var mockProject, invalidMockProject models.Project
-	err := faker.FakeData(&mockProject)
-	assert.NoError(t, err)
-
-	invalidMockProject.ID += mockProject.ID + 1
-
-	mockProjectRepo := goalMocks.NewRepositoryI(t)
-
-	mockProjectRepo.On("GetProject", mockProject.ID).Return(&mockProject, nil)
-	mockProjectRepo.On("UpdateProject", &mockProject).Return(nil)
-
-	mockProjectRepo.On("GetProject", invalidMockProject.ID).Return(nil, models.ErrNotFound)
-
-	useCase := usecase.New(mockProjectRepo, nil)
-
-	cases := map[string]TestCaseCreateUpdateProject{
-		"success": {
-			ArgData: &mockProject,
+			ArgData: &project,
 			Error:   nil,
 		},
-		"Project not found": {
-			ArgData: &invalidMockProject,
+		"project not found": {
+			ArgData: &notFoundProject,
 			Error:   models.ErrNotFound,
 		},
 	}
 
 	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			err := useCase.UpdateProject(test.ArgData)
-			require.Equal(t, test.Error, errors.Cause(err))
+		t.Run(name, func(t provider.T) {
+			err := s.uc.UpdateProject(test.ArgData)
+			t.Assert().ErrorIs(err, test.Error)
 		})
 	}
-	mockProjectRepo.AssertExpectations(t)
 }
 
-func TestUsecaseCreateProject(t *testing.T) {
-	var mockProject models.Project
-	err := faker.FakeData(&mockProject)
-	assert.NoError(t, err)
+func (s *ProjectTestSuite) TestGetProject(t provider.T) {
+	project := s.projectBuilder.WithID(1).WithName("project").Build()
 
-	mockProjectRepo := goalMocks.NewRepositoryI(t)
+	s.prRepoMock.On("GetProject", project.ID).Return(&project, nil)
+	result, err := s.uc.GetProject(project.ID)
 
-	mockProjectRepo.On("CreateProject", &mockProject).Return(nil)
+	t.Assert().NoError(err)
+	t.Assert().Equal(project, *result)
+}
 
-	useCase := usecase.New(mockProjectRepo, nil)
+func (s *ProjectTestSuite) TestDeleteProject(t provider.T) {
+	project := s.projectBuilder.WithID(1).WithName("project").WithUserID(2).Build()
+	notFoundProject := s.projectBuilder.WithID(0).WithUserID(3).Build()
 
-	cases := map[string]TestCaseCreateUpdateProject{
+	s.prRepoMock.On("GetProject", project.ID).Return(&project, nil)
+	s.prRepoMock.On("DeleteProject", project.ID).Return(nil)
+	s.prRepoMock.On("GetProject", notFoundProject.ID).Return(nil, models.ErrNotFound)
+
+	cases := map[string]struct {
+		ProjectID uint64
+		UserID    uint64
+		Error     error
+	}{
 		"success": {
-			ArgData: &mockProject,
-			Error:   nil,
+			ProjectID: project.ID,
+			UserID:    *project.UserID,
+			Error:     nil,
+		},
+		"project not found": {
+			ProjectID: notFoundProject.ID,
+			UserID:    *notFoundProject.UserID,
+			Error:     models.ErrNotFound,
 		},
 	}
 
 	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			err := useCase.CreateProject(test.ArgData)
-			require.Equal(t, test.Error, errors.Cause(err))
+		t.Run(name, func(t provider.T) {
+			err := s.uc.DeleteProject(test.ProjectID, test.UserID)
+			t.Assert().ErrorIs(err, test.Error)
 		})
 	}
-	mockProjectRepo.AssertExpectations(t)
 }
 
-func TestUsecaseDeleteProject(t *testing.T) {
-	var mockProject, invalidMockProject models.Project
-	err := faker.FakeData(&mockProject)
-	assert.NoError(t, err)
+func (s *ProjectTestSuite) TestUsecaseGetUserProjects(t provider.T) {
+	projects := make([]*models.Project, 0, 10)
+	err := faker.FakeData(&projects)
 
-	invalidMockProject.ID += mockProject.ID + 1
-	*invalidMockProject.UserID += *mockProject.UserID + 1
+	for idx := range projects {
+		projects[idx].UserID = projects[0].UserID
+	}
+	t.Assert().NoError(err)
+	s.prRepoMock.On("GetUserProjects", *projects[0].UserID).Return(projects, nil)
 
-	mockProjectRepo := goalMocks.NewRepositoryI(t)
-
-	mockProjectRepo.On("GetProject", mockProject.ID).Return(&mockProject, nil)
-	mockProjectRepo.On("DeleteProject", mockProject.ID).Return(nil)
-
-	mockProjectRepo.On("GetProject", invalidMockProject.ID).Return(nil, models.ErrNotFound)
-
-	useCase := usecase.New(mockProjectRepo, nil)
-
-	cases := map[string]TestCaseDeleteProject{
+	cases := map[string]struct {
+		UserID   uint64
+		Projects []*models.Project
+		Error    error
+	}{
 		"success": {
-			ArgData: []*uint64{&mockProject.ID, mockProject.UserID},
-			Error:   nil,
-		},
-		"Project not found": {
-			ArgData: []*uint64{&invalidMockProject.ID, invalidMockProject.UserID},
-			Error:   models.ErrNotFound,
+			UserID:   *projects[0].UserID,
+			Projects: projects,
+			Error:    nil,
 		},
 	}
 
 	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			err := useCase.DeleteProject(*test.ArgData[0], *test.ArgData[1])
-			require.Equal(t, test.Error, errors.Cause(err))
+		t.Run(name, func(t provider.T) {
+			resProjects, err := s.uc.GetUserProjects(test.UserID)
+			t.Assert().ErrorIs(err, test.Error)
+			t.Assert().Equal(projects, resProjects)
 		})
 	}
-	mockProjectRepo.AssertExpectations(t)
-}
-
-func TestUsecaseGetUserProjects(t *testing.T) {
-	mockProjectRes := make([]*models.Project, 0, 10)
-	err := faker.FakeData(&mockProjectRes)
-
-	for idx := range mockProjectRes {
-		mockProjectRes[idx].UserID = mockProjectRes[0].UserID
-	}
-	assert.NoError(t, err)
-
-	mockExpectedProject := mockProjectRes
-
-	mockProjectRepo := goalMocks.NewRepositoryI(t)
-
-	mockProjectRepo.On("GetUserProjects", mockProjectRes[0].UserID).Return(mockProjectRes, nil)
-
-	useCase := usecase.New(mockProjectRepo, nil)
-
-	cases := map[string]TestCaseGetUserProjects{
-		"success": {
-			ArgData:     mockProjectRes[0].UserID,
-			ExpectedRes: mockExpectedProject,
-			Error:       nil,
-		},
-	}
-
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			user, err := useCase.GetUserProjects(*test.ArgData)
-			require.Equal(t, test.Error, err)
-
-			if err == nil {
-				assert.Equal(t, test.ExpectedRes, user)
-			}
-		})
-	}
-	mockProjectRepo.AssertExpectations(t)
 }

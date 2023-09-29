@@ -1,206 +1,143 @@
-package usecase_test
+package usecase
 
 import (
-	"github.com/bxcodec/faker"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"testing"
-	tagMocks "timetracker/internal/Tag/repository/mocks"
-	"timetracker/internal/Tag/usecase"
+
+	tagRepoMock "timetracker/internal/Tag/repository/mocks"
+	"timetracker/internal/testutils"
 	"timetracker/models"
+
+	"github.com/bxcodec/faker"
+	"github.com/ozontech/allure-go/pkg/framework/provider"
+	"github.com/ozontech/allure-go/pkg/framework/suite"
 )
 
-type TestCaseGetTag struct {
-	ArgData     uint64
-	ExpectedRes *models.Tag
-	Error       error
+type TagTestSuite struct {
+	suite.Suite
+	uc          UsecaseI
+	tagRepoMock *tagRepoMock.RepositoryI
+	tagBuilder  *testutils.TagBuilder
 }
 
-type TestCaseDeleteTag struct {
-	ArgData []uint64
-	Error   error
+func TestTagTestSuite(t *testing.T) {
+	suite.RunSuite(t, new(TagTestSuite))
 }
 
-type TestCaseCreateUpdateTag struct {
-	ArgData *models.Tag
-	Error   error
+func (s *TagTestSuite) BeforeEach(t provider.T) {
+	s.tagRepoMock = tagRepoMock.NewRepositoryI(t)
+	s.uc = New(s.tagRepoMock)
+	s.tagBuilder = testutils.NewTagBuilder()
 }
 
-type TestCaseGetUserTags struct {
-	ArgData     uint64
-	ExpectedRes []*models.Tag
-	Error       error
+func (s *TagTestSuite) TestCreateTag(t provider.T) {
+	tag := s.tagBuilder.WithID(1).WithName("tag").Build()
+
+	s.tagRepoMock.On("CreateTag", &tag).Return(nil)
+	err := s.uc.CreateTag(&tag)
+
+	t.Assert().NoError(err)
 }
 
-func TestUsecaseGetTag(t *testing.T) {
-	var mockTagRes models.Tag
-	err := faker.FakeData(&mockTagRes)
-	assert.NoError(t, err)
+func (s *TagTestSuite) TestUpdateTag(t provider.T) {
+	tag := s.tagBuilder.WithID(1).WithName("tag").Build()
+	notFoundTag := s.tagBuilder.WithID(0).Build()
 
-	mockExpectedTag := mockTagRes
+	s.tagRepoMock.On("GetTag", tag.ID).Return(&tag, nil)
+	s.tagRepoMock.On("UpdateTag", &tag).Return(nil)
+	s.tagRepoMock.On("GetTag", notFoundTag.ID).Return(nil, models.ErrNotFound)
 
-	mockTagRepo := tagMocks.NewRepositoryI(t)
-
-	mockTagRepo.On("GetTag", mockTagRes.ID).Return(&mockTagRes, nil)
-
-	useCase := usecase.New(mockTagRepo)
-
-	cases := map[string]TestCaseGetTag{
+	cases := map[string]struct {
+		ArgData *models.Tag
+		Error   error
+	}{
 		"success": {
-			ArgData:     mockTagRes.ID,
-			ExpectedRes: &mockExpectedTag,
-			Error:       nil,
-		},
-	}
-
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			user, err := useCase.GetTag(test.ArgData)
-			require.Equal(t, test.Error, err)
-
-			if err == nil {
-				assert.Equal(t, test.ExpectedRes, user)
-			}
-		})
-	}
-	mockTagRepo.AssertExpectations(t)
-}
-
-func TestUsecaseUpdateTag(t *testing.T) {
-	var mockTag, invalidMockTag models.Tag
-	err := faker.FakeData(&mockTag)
-	assert.NoError(t, err)
-
-	invalidMockTag.ID += mockTag.ID + 1
-
-	mockTagRepo := tagMocks.NewRepositoryI(t)
-
-	mockTagRepo.On("GetTag", mockTag.ID).Return(&mockTag, nil)
-	mockTagRepo.On("UpdateTag", &mockTag).Return(nil)
-
-	mockTagRepo.On("GetTag", invalidMockTag.ID).Return(nil, models.ErrNotFound)
-
-	useCase := usecase.New(mockTagRepo)
-
-	cases := map[string]TestCaseCreateUpdateTag{
-		"success": {
-			ArgData: &mockTag,
+			ArgData: &tag,
 			Error:   nil,
 		},
-		"Tag not found": {
-			ArgData: &invalidMockTag,
+		"tag not found": {
+			ArgData: &notFoundTag,
 			Error:   models.ErrNotFound,
 		},
 	}
 
 	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			err := useCase.UpdateTag(test.ArgData)
-			require.Equal(t, test.Error, errors.Cause(err))
+		t.Run(name, func(t provider.T) {
+			err := s.uc.UpdateTag(test.ArgData)
+			t.Assert().ErrorIs(err, test.Error)
 		})
 	}
-	mockTagRepo.AssertExpectations(t)
 }
 
-func TestUsecaseCreateTag(t *testing.T) {
-	var mockTag models.Tag
-	err := faker.FakeData(&mockTag)
-	assert.NoError(t, err)
+func (s *TagTestSuite) TestGetTag(t provider.T) {
+	tag := s.tagBuilder.WithID(1).WithName("tag").Build()
 
-	mockTagRepo := tagMocks.NewRepositoryI(t)
+	s.tagRepoMock.On("GetTag", tag.ID).Return(&tag, nil)
+	result, err := s.uc.GetTag(tag.ID)
 
-	mockTagRepo.On("CreateTag", &mockTag).Return(nil)
+	t.Assert().NoError(err)
+	t.Assert().Equal(tag, *result)
+}
 
-	useCase := usecase.New(mockTagRepo)
+func (s *TagTestSuite) TestDeleteTag(t provider.T) {
+	tag := s.tagBuilder.WithID(1).WithName("tag").WithUserID(2).Build()
+	notFoundTag := s.tagBuilder.WithID(0).WithUserID(3).Build()
 
-	cases := map[string]TestCaseCreateUpdateTag{
+	s.tagRepoMock.On("GetTag", tag.ID).Return(&tag, nil)
+	s.tagRepoMock.On("DeleteTag", tag.ID).Return(nil)
+	s.tagRepoMock.On("GetTag", notFoundTag.ID).Return(nil, models.ErrNotFound)
+
+	cases := map[string]struct {
+		TagID  uint64
+		UserID uint64
+		Error  error
+	}{
 		"success": {
-			ArgData: &mockTag,
-			Error:   nil,
+			TagID:  tag.ID,
+			UserID: tag.UserID,
+			Error:  nil,
+		},
+		"tag not found": {
+			TagID:  notFoundTag.ID,
+			UserID: notFoundTag.UserID,
+			Error:  models.ErrNotFound,
 		},
 	}
 
 	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			err := useCase.CreateTag(test.ArgData)
-			require.Equal(t, test.Error, errors.Cause(err))
+		t.Run(name, func(t provider.T) {
+			err := s.uc.DeleteTag(test.TagID, test.UserID)
+			t.Assert().ErrorIs(err, test.Error)
 		})
 	}
-	mockTagRepo.AssertExpectations(t)
 }
 
-func TestUsecaseDeleteTag(t *testing.T) {
-	var mockTag, invalidMockTag models.Tag
-	err := faker.FakeData(&mockTag)
-	assert.NoError(t, err)
+func (s *TagTestSuite) TestUsecaseGetUserTags(t provider.T) {
+	tags := make([]*models.Tag, 0, 10)
+	err := faker.FakeData(&tags)
 
-	invalidMockTag.ID += mockTag.ID + 1
-	invalidMockTag.UserID += mockTag.UserID + 1
+	for idx := range tags {
+		tags[idx].UserID = tags[0].UserID
+	}
+	t.Assert().NoError(err)
+	s.tagRepoMock.On("GetUserTags", tags[0].UserID).Return(tags, nil)
 
-	mockTagRepo := tagMocks.NewRepositoryI(t)
-
-	mockTagRepo.On("GetTag", mockTag.ID).Return(&mockTag, nil)
-	mockTagRepo.On("DeleteTag", mockTag.ID).Return(nil)
-
-	mockTagRepo.On("GetTag", invalidMockTag.ID).Return(nil, models.ErrNotFound)
-
-	useCase := usecase.New(mockTagRepo)
-
-	cases := map[string]TestCaseDeleteTag{
+	cases := map[string]struct {
+		UserID uint64
+		Tags   []*models.Tag
+		Error  error
+	}{
 		"success": {
-			ArgData: []uint64{mockTag.ID, mockTag.UserID},
-			Error:   nil,
-		},
-		"Tag not found": {
-			ArgData: []uint64{invalidMockTag.ID, invalidMockTag.UserID},
-			Error:   models.ErrNotFound,
+			UserID: tags[0].UserID,
+			Tags:   tags,
+			Error:  nil,
 		},
 	}
 
 	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			err := useCase.DeleteTag(test.ArgData[0], test.ArgData[1])
-			require.Equal(t, test.Error, errors.Cause(err))
+		t.Run(name, func(t provider.T) {
+			resTags, err := s.uc.GetUserTags(test.UserID)
+			t.Assert().ErrorIs(err, test.Error)
+			t.Assert().Equal(tags, resTags)
 		})
 	}
-	mockTagRepo.AssertExpectations(t)
-}
-
-func TestUsecaseGetUserTags(t *testing.T) {
-	mockTagRes := make([]*models.Tag, 0, 10)
-	err := faker.FakeData(&mockTagRes)
-
-	for idx := range mockTagRes {
-		mockTagRes[idx].UserID = mockTagRes[0].UserID
-	}
-	assert.NoError(t, err)
-
-	mockExpectedTag := mockTagRes
-
-	mockTagRepo := tagMocks.NewRepositoryI(t)
-
-	mockTagRepo.On("GetUserTags", mockTagRes[0].UserID).Return(mockTagRes, nil)
-
-	useCase := usecase.New(mockTagRepo)
-
-	cases := map[string]TestCaseGetUserTags{
-		"success": {
-			ArgData:     mockTagRes[0].UserID,
-			ExpectedRes: mockExpectedTag,
-			Error:       nil,
-		},
-	}
-
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			user, err := useCase.GetUserTags(test.ArgData)
-			require.Equal(t, test.Error, err)
-
-			if err == nil {
-				assert.Equal(t, test.ExpectedRes, user)
-			}
-		})
-	}
-	mockTagRepo.AssertExpectations(t)
 }

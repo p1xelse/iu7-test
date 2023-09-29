@@ -30,7 +30,7 @@ func New(fRep friendRep.RepositoryI, uRep userRep.RepositoryI) UsecaseI {
 }
 
 func (uc *usecase) CreateFriendRelation(friendRel *models.FriendRelation) error {
-	if friendRel.SubscriberID == friendRel.UserID {
+	if *friendRel.SubscriberID == *friendRel.UserID {
 		return models.ErrBadRequest
 	}
 
@@ -52,7 +52,7 @@ func (uc *usecase) CreateFriendRelation(friendRel *models.FriendRelation) error 
 }
 
 func (uc *usecase) DeleteFriendRelation(friends *models.FriendRelation) error {
-	if friends.SubscriberID == friends.UserID {
+	if *friends.SubscriberID == *friends.UserID {
 		return models.ErrBadRequest
 	}
 

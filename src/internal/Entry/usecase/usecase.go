@@ -4,7 +4,6 @@ import (
 	"time"
 	entryRep "timetracker/internal/Entry/repository"
 	tagRep "timetracker/internal/Tag/repository"
-	userRep "timetracker/internal/User/repository"
 	"timetracker/models"
 
 	"github.com/pkg/errors"
@@ -22,14 +21,12 @@ type UsecaseI interface {
 type usecase struct {
 	entryRepository entryRep.RepositoryI
 	tagRepository   tagRep.RepositoryI
-	userRepository  userRep.RepositoryI
 }
 
-func New(eRep entryRep.RepositoryI, tRep tagRep.RepositoryI, uRep userRep.RepositoryI) UsecaseI {
+func New(eRep entryRep.RepositoryI, tRep tagRep.RepositoryI) UsecaseI {
 	return &usecase{
 		entryRepository: eRep,
 		tagRepository:   tRep,
-		userRepository:  uRep,
 	}
 }
 

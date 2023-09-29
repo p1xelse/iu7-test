@@ -55,7 +55,7 @@ func (suite *UsecaseRepositoryTestSuite) TestUsecaseCreateProject() {
 	}
 
 	projectRepo := projectRep.NewProjectRepository(suite.db)
-	useCase := projectUsecase.New(projectRepo)
+	useCase := projectUsecase.New(projectRepo, nil)
 
 	suite.Assert().NoError(useCase.CreateProject(newProject))
 
@@ -77,7 +77,7 @@ func (suite *UsecaseRepositoryTestSuite) TestUsecaseGetProject() {
 	}
 
 	projectRepo := projectRep.NewProjectRepository(suite.db)
-	useCase := projectUsecase.New(projectRepo)
+	useCase := projectUsecase.New(projectRepo, nil)
 
 	suite.Assert().NoError(useCase.CreateProject(newProject))
 
@@ -99,7 +99,7 @@ func (suite *UsecaseRepositoryTestSuite) TestUsecaseUpdateProject() {
 	}
 
 	projectRepo := projectRep.NewProjectRepository(suite.db)
-	useCase := projectUsecase.New(projectRepo)
+	useCase := projectUsecase.New(projectRepo, nil)
 
 	suite.Assert().NoError(useCase.CreateProject(newProject))
 
@@ -133,7 +133,7 @@ func (suite *UsecaseRepositoryTestSuite) TestUsecaseCreateEntry() {
 
 	entryRepo := entryRep.NewEntryRepository(suite.db)
 	tagRepo := tagRep.NewTagRepository(suite.db)
-	useCase := entryUsecase.New(entryRepo, tagRepo, nil)
+	useCase := entryUsecase.New(entryRepo, tagRepo)
 
 	suite.Assert().NoError(useCase.CreateEntry(newEntry))
 
@@ -159,7 +159,7 @@ func (suite *UsecaseRepositoryTestSuite) TestUsecaseGetEntry() {
 
 	entryRepo := entryRep.NewEntryRepository(suite.db)
 	tagRepo := tagRep.NewTagRepository(suite.db)
-	useCase := entryUsecase.New(entryRepo, tagRepo, nil)
+	useCase := entryUsecase.New(entryRepo, tagRepo)
 
 	suite.Assert().NoError(useCase.CreateEntry(newEntry))
 
@@ -185,7 +185,7 @@ func (suite *UsecaseRepositoryTestSuite) TestUsecaseUpdateEntry() {
 
 	entryRepo := entryRep.NewEntryRepository(suite.db)
 	tagRepo := tagRep.NewTagRepository(suite.db)
-	useCase := entryUsecase.New(entryRepo, tagRepo, nil)
+	useCase := entryUsecase.New(entryRepo, tagRepo)
 
 	suite.Assert().NoError(useCase.CreateEntry(newEntry))
 

@@ -44,11 +44,21 @@ func toModelUser(u *User) *models.User {
 	}
 }
 
-func toModelUsers(entries []*User) []*models.User {
-	out := make([]*models.User, len(entries))
+func toModelUsers(users []*User) []*models.User {
+	out := make([]*models.User, len(users))
 
-	for i, b := range entries {
+	for i, b := range users {
 		out[i] = toModelUser(b)
+	}
+
+	return out
+}
+
+func toPostgresUsers(users []*models.User) []*User {
+	out := make([]*User, len(users))
+
+	for i, b := range users {
+		out[i] = toPostgresUser(b)
 	}
 
 	return out

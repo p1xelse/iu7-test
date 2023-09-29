@@ -1,206 +1,143 @@
-package usecase_test
+package usecase
 
 import (
-	"github.com/bxcodec/faker"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"testing"
-	goalMocks "timetracker/internal/Goal/repository/mocks"
-	"timetracker/internal/Goal/usecase"
+
+	goalRepoMock "timetracker/internal/Goal/repository/mocks"
+	"timetracker/internal/testutils"
 	"timetracker/models"
+
+	"github.com/bxcodec/faker"
+	"github.com/ozontech/allure-go/pkg/framework/provider"
+	"github.com/ozontech/allure-go/pkg/framework/suite"
 )
 
-type TestCaseGetGoal struct {
-	ArgData     uint64
-	ExpectedRes *models.Goal
-	Error       error
+type GoalTestSuite struct {
+	suite.Suite
+	uc           UsecaseI
+	goalRepoMock *goalRepoMock.RepositoryI
+	goalBuilder  *testutils.GoalBuilder
 }
 
-type TestCaseDeleteGoal struct {
-	ArgData []uint64
-	Error   error
+func TestGoalTestSuite(t *testing.T) {
+	suite.RunSuite(t, new(GoalTestSuite))
 }
 
-type TestCaseCreateUpdateGoal struct {
-	ArgData *models.Goal
-	Error   error
+func (s *GoalTestSuite) BeforeEach(t provider.T) {
+	s.goalRepoMock = goalRepoMock.NewRepositoryI(t)
+	s.uc = New(s.goalRepoMock)
+	s.goalBuilder = testutils.NewGoalBuilder()
 }
 
-type TestCaseGetUserGoals struct {
-	ArgData     uint64
-	ExpectedRes []*models.Goal
-	Error       error
+func (s *GoalTestSuite) TestCreateGoal(t provider.T) {
+	goal := s.goalBuilder.WithID(1).WithName("goal").Build()
+
+	s.goalRepoMock.On("CreateGoal", &goal).Return(nil)
+	err := s.uc.CreateGoal(&goal)
+
+	t.Assert().NoError(err)
 }
 
-func TestUsecaseGetGoal(t *testing.T) {
-	var mockGoalRes models.Goal
-	err := faker.FakeData(&mockGoalRes)
-	assert.NoError(t, err)
+func (s *GoalTestSuite) TestUpdateGoal(t provider.T) {
+	goal := s.goalBuilder.WithID(1).WithName("goal").Build()
+	notFoundGoal := s.goalBuilder.WithID(0).Build()
 
-	mockExpectedGoal := mockGoalRes
+	s.goalRepoMock.On("GetGoal", goal.ID).Return(&goal, nil)
+	s.goalRepoMock.On("UpdateGoal", &goal).Return(nil)
+	s.goalRepoMock.On("GetGoal", notFoundGoal.ID).Return(nil, models.ErrNotFound)
 
-	mockGoalRepo := goalMocks.NewRepositoryI(t)
-
-	mockGoalRepo.On("GetGoal", mockGoalRes.ID).Return(&mockGoalRes, nil)
-
-	useCase := usecase.New(mockGoalRepo)
-
-	cases := map[string]TestCaseGetGoal{
+	cases := map[string]struct {
+		ArgData *models.Goal
+		Error   error
+	}{
 		"success": {
-			ArgData:     mockGoalRes.ID,
-			ExpectedRes: &mockExpectedGoal,
-			Error:       nil,
-		},
-	}
-
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			user, err := useCase.GetGoal(test.ArgData)
-			require.Equal(t, test.Error, err)
-
-			if err == nil {
-				assert.Equal(t, test.ExpectedRes, user)
-			}
-		})
-	}
-	mockGoalRepo.AssertExpectations(t)
-}
-
-func TestUsecaseUpdateGoal(t *testing.T) {
-	var mockGoal, invalidMockGoal models.Goal
-	err := faker.FakeData(&mockGoal)
-	assert.NoError(t, err)
-
-	invalidMockGoal.ID += mockGoal.ID + 1
-
-	mockGoalRepo := goalMocks.NewRepositoryI(t)
-
-	mockGoalRepo.On("GetGoal", mockGoal.ID).Return(&mockGoal, nil)
-	mockGoalRepo.On("UpdateGoal", &mockGoal).Return(nil)
-
-	mockGoalRepo.On("GetGoal", invalidMockGoal.ID).Return(nil, models.ErrNotFound)
-
-	useCase := usecase.New(mockGoalRepo)
-
-	cases := map[string]TestCaseCreateUpdateGoal{
-		"success": {
-			ArgData: &mockGoal,
+			ArgData: &goal,
 			Error:   nil,
 		},
-		"Goal not found": {
-			ArgData: &invalidMockGoal,
+		"goal not found": {
+			ArgData: &notFoundGoal,
 			Error:   models.ErrNotFound,
 		},
 	}
 
 	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			err := useCase.UpdateGoal(test.ArgData)
-			require.Equal(t, test.Error, errors.Cause(err))
+		t.Run(name, func(t provider.T) {
+			err := s.uc.UpdateGoal(test.ArgData)
+			t.Assert().ErrorIs(err, test.Error)
 		})
 	}
-	mockGoalRepo.AssertExpectations(t)
 }
 
-func TestUsecaseCreateGoal(t *testing.T) {
-	var mockGoal models.Goal
-	err := faker.FakeData(&mockGoal)
-	assert.NoError(t, err)
+func (s *GoalTestSuite) TestGetGoal(t provider.T) {
+	goal := s.goalBuilder.WithID(1).WithName("goal").Build()
 
-	mockGoalRepo := goalMocks.NewRepositoryI(t)
+	s.goalRepoMock.On("GetGoal", goal.ID).Return(&goal, nil)
+	result, err := s.uc.GetGoal(goal.ID)
 
-	mockGoalRepo.On("CreateGoal", &mockGoal).Return(nil)
+	t.Assert().NoError(err)
+	t.Assert().Equal(goal, *result)
+}
 
-	useCase := usecase.New(mockGoalRepo)
+func (s *GoalTestSuite) TestDeleteGoal(t provider.T) {
+	goal := s.goalBuilder.WithID(1).WithName("goal").WithUserID(2).Build()
+	notFoundGoal := s.goalBuilder.WithID(0).WithUserID(3).Build()
 
-	cases := map[string]TestCaseCreateUpdateGoal{
+	s.goalRepoMock.On("GetGoal", goal.ID).Return(&goal, nil)
+	s.goalRepoMock.On("DeleteGoal", goal.ID).Return(nil)
+	s.goalRepoMock.On("GetGoal", notFoundGoal.ID).Return(nil, models.ErrNotFound)
+
+	cases := map[string]struct {
+		GoalID uint64
+		UserID uint64
+		Error  error
+	}{
 		"success": {
-			ArgData: &mockGoal,
-			Error:   nil,
+			GoalID: goal.ID,
+			UserID: *goal.UserID,
+			Error:  nil,
+		},
+		"goal not found": {
+			GoalID: notFoundGoal.ID,
+			UserID: *notFoundGoal.UserID,
+			Error:  models.ErrNotFound,
 		},
 	}
 
 	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			err := useCase.CreateGoal(test.ArgData)
-			require.Equal(t, test.Error, errors.Cause(err))
+		t.Run(name, func(t provider.T) {
+			err := s.uc.DeleteGoal(test.GoalID, test.UserID)
+			t.Assert().ErrorIs(err, test.Error)
 		})
 	}
-	mockGoalRepo.AssertExpectations(t)
 }
 
-func TestUsecaseDeleteGoal(t *testing.T) {
-	var mockGoal, invalidMockGoal models.Goal
-	err := faker.FakeData(&mockGoal)
-	assert.NoError(t, err)
+func (s *GoalTestSuite) TestUsecaseGetUserGoals(t provider.T) {
+	goals := make([]*models.Goal, 0, 10)
+	err := faker.FakeData(&goals)
 
-	invalidMockGoal.ID += mockGoal.ID + 1
-	*invalidMockGoal.UserID += *mockGoal.UserID + 1
+	for idx := range goals {
+		goals[idx].UserID = goals[0].UserID
+	}
+	t.Assert().NoError(err)
+	s.goalRepoMock.On("GetUserGoals", *goals[0].UserID).Return(goals, nil)
 
-	mockGoalRepo := goalMocks.NewRepositoryI(t)
-
-	mockGoalRepo.On("GetGoal", mockGoal.ID).Return(&mockGoal, nil)
-	mockGoalRepo.On("DeleteGoal", mockGoal.ID).Return(nil)
-
-	mockGoalRepo.On("GetGoal", invalidMockGoal.ID).Return(nil, models.ErrNotFound)
-
-	useCase := usecase.New(mockGoalRepo)
-
-	cases := map[string]TestCaseDeleteGoal{
+	cases := map[string]struct {
+		UserID uint64
+		Goals  []*models.Goal
+		Error  error
+	}{
 		"success": {
-			ArgData: []uint64{mockGoal.ID, *mockGoal.UserID},
-			Error:   nil,
-		},
-		"Goal not found": {
-			ArgData: []uint64{invalidMockGoal.ID, *invalidMockGoal.UserID},
-			Error:   models.ErrNotFound,
+			UserID: *goals[0].UserID,
+			Goals:  goals,
+			Error:  nil,
 		},
 	}
 
 	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			err := useCase.DeleteGoal(test.ArgData[0], test.ArgData[1])
-			require.Equal(t, test.Error, errors.Cause(err))
+		t.Run(name, func(t provider.T) {
+			resGoals, err := s.uc.GetUserGoals(test.UserID)
+			t.Assert().ErrorIs(err, test.Error)
+			t.Assert().Equal(goals, resGoals)
 		})
 	}
-	mockGoalRepo.AssertExpectations(t)
-}
-
-func TestUsecaseGetUserGoals(t *testing.T) {
-	mockGoalRes := make([]*models.Goal, 0, 10)
-	err := faker.FakeData(&mockGoalRes)
-
-	for idx := range mockGoalRes {
-		mockGoalRes[idx].UserID = mockGoalRes[0].UserID
-	}
-	assert.NoError(t, err)
-
-	mockExpectedGoal := mockGoalRes
-
-	mockGoalRepo := goalMocks.NewRepositoryI(t)
-
-	mockGoalRepo.On("GetUserGoals", mockGoalRes[0].UserID).Return(mockGoalRes, nil)
-
-	useCase := usecase.New(mockGoalRepo)
-
-	cases := map[string]TestCaseGetUserGoals{
-		"success": {
-			ArgData:     *mockGoalRes[0].UserID,
-			ExpectedRes: mockExpectedGoal,
-			Error:       nil,
-		},
-	}
-
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			user, err := useCase.GetUserGoals(test.ArgData)
-			require.Equal(t, test.Error, err)
-
-			if err == nil {
-				assert.Equal(t, test.ExpectedRes, user)
-			}
-		})
-	}
-	mockGoalRepo.AssertExpectations(t)
 }
