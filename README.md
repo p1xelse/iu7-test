@@ -20,6 +20,9 @@
 Запуск:
 ```bash
 make test-allure
+
+#в случайно порядке
+make test-allure-shuffle
 ```
 deps:
 - allure

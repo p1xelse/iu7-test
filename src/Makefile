@@ -5,7 +5,11 @@ test:
 
 test-allure: clean
 	sh allure_test_report.sh
-	allure serve allure
+	allure serve allure-results
+
+test-allure-shuffle: clean
+	sh allure_test_report_shuffle.sh
+	allure serve allure-results
 
 integration-test-db:
 	docker compose down && docker compose up -d
@@ -19,4 +23,4 @@ integration-test: start-docker
 	newman run Timetracker.postman_collection.json
 
 clean:
-	rm -rf allure
+	rm -rf allure-results

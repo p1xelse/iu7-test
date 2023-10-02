@@ -87,7 +87,7 @@ func (tt TimeTracker) Run(sessionDB string) error {
 	friendRepo := friendRep.NewFriendRepository(postgresClient)
 	cacheStorage := cache.NewStorageRedis(redisCacheClient)
 
-	entryUC := entryUsecase.New(entryRepo, tagRepo, userRepo)
+	entryUC := entryUsecase.New(entryRepo, tagRepo)
 	goalUC := goalUsecase.New(goalRepo)
 	projectUC := projectUsecase.New(projectRepo, cacheStorage)
 	tagUC := tagUsecase.New(tagRepo)

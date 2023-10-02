@@ -1,0 +1,3 @@
+export ALLURE_OUTPUT_PATH=$(pwd)
+cd internal
+go test -shuffle=on ./...
