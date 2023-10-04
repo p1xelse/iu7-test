@@ -80,7 +80,7 @@ func (delivery *Delivery) CreateEntry(c echo.Context) error {
 
 	respEntry := dto.GetResponseFromModelEntry(entry)
 
-	return c.JSON(http.StatusOK, pkg.Response{Body: *respEntry})
+	return c.JSON(http.StatusCreated, pkg.Response{Body: *respEntry})
 }
 
 // GetEntry godoc
