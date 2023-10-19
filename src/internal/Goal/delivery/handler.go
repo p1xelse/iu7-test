@@ -80,7 +80,7 @@ func (delivery *Delivery) CreateGoal(c echo.Context) error {
 
 	respGoal := dto.GetResponseFromModelGoal(goal)
 
-	return c.JSON(http.StatusOK, pkg.Response{Body: *respGoal})
+	return c.JSON(http.StatusCreated, pkg.Response{Body: *respGoal})
 }
 
 // GetGoal godoc

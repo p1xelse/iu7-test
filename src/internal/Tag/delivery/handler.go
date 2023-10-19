@@ -80,7 +80,7 @@ func (delivery *Delivery) CreateTag(c echo.Context) error {
 
 	respTag := dto.GetResponseFromModelTag(tag)
 
-	return c.JSON(http.StatusOK, pkg.Response{Body: *respTag})
+	return c.JSON(http.StatusCreated, pkg.Response{Body: *respTag})
 }
 
 // GetTag godoc
@@ -184,7 +184,6 @@ func (delivery *Delivery) UpdateTag(c echo.Context) error {
 // @Failure 403 {object} echo.HTTPError "invalid csrf"
 // @Router   /tag/{id} [delete]
 func (delivery *Delivery) DeleteTag(c echo.Context) error {
-
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.Logger().Error(err)

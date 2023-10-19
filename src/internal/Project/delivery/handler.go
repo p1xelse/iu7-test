@@ -80,7 +80,7 @@ func (delivery *Delivery) CreateProject(c echo.Context) error {
 
 	respProject := dto.GetResponseFromModelProject(project)
 
-	return c.JSON(http.StatusOK, pkg.Response{Body: *respProject})
+	return c.JSON(http.StatusCreated, pkg.Response{Body: *respProject})
 }
 
 // GetProject godoc
@@ -226,8 +226,8 @@ func (delivery *Delivery) GetMyProjects(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, models.ErrInternalServerError.Error())
 	}
 
-	// projects, err := delivery.ProjectUC.GetUserProjects(userId)
-	projects, err := delivery.ProjectUC.GetUserProjectsWithCache(userId)
+	projects, err := delivery.ProjectUC.GetUserProjects(userId)
+	// projects, err := delivery.ProjectUC.GetUserProjectsWithCache(userId)
 
 	if err != nil {
 		c.Logger().Error(err)
@@ -290,8 +290,8 @@ func NewDelivery(e *echo.Echo, pu projectUsecase.UsecaseI, aclM *middleware.AclM
 	}
 
 	e.POST("/project/create", handler.CreateProject)
-	e.POST("/project/edit", handler.UpdateProject) //acl: owner
-	e.GET("/project/:id", handler.GetProject) //acl: owner, admin
+	e.POST("/project/edit", handler.UpdateProject)  //acl: owner
+	e.GET("/project/:id", handler.GetProject)       //acl: owner, admin
 	e.DELETE("/project/:id", handler.DeleteProject) //acl: owner
 	e.GET("/me/projects", handler.GetMyProjects)
 	e.GET("/user/:user_id/projects", handler.GetUserProjects, aclM.FriendsOrAdminOnly)

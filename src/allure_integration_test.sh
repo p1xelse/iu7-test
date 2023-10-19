@@ -1,0 +1,3 @@
+export ALLURE_OUTPUT_PATH=$(pwd)
+cd integration_test
+go test ./...

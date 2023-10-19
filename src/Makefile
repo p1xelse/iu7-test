@@ -19,8 +19,9 @@ integration-test-db:
 start-docker:
 	docker compose down && docker compose up -d
 
-integration-test: start-docker
-	newman run Timetracker.postman_collection.json
+integration-test:
+	sh allure_integration_test.sh
+	allure serve allure-results
 
 clean:
 	rm -rf allure-results

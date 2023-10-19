@@ -178,7 +178,7 @@ func (s *FriendTestIntegrationSuite) TestGetUserFriends(t provider.T) {
 
 	// имитируем вызов мидлвары
 	integrationutils.AuthMiddlewareAction(ctx)
-	t.Require().NoError(s.delivery.GetUserSubs(ctx))
+	t.Require().NoError(s.delivery.GetUserFriends(ctx))
 	t.Assert().Equal(http.StatusOK, rec.Code)
 	t.Assert().JSONEq(string(expDataJson), rec.Body.String())
 }

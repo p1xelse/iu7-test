@@ -36,7 +36,7 @@ type EntryTestIntegrationSuite struct {
 	tagBuilder      *testutils.TagBuilder
 }
 
-func getJsonData(t provider.T, entryDto dto.ReqCreateUpdateEntry) (entryDtoJson []byte) {
+func getJsonDataEntry(t provider.T, entryDto dto.ReqCreateUpdateEntry) (entryDtoJson []byte) {
 	entryDtoJson, err := json.Marshal(entryDto)
 	t.Require().NoError(err)
 
@@ -73,7 +73,7 @@ func (s *EntryTestIntegrationSuite) TestCreateEntry(t provider.T) {
 
 	entryModel := entryDto.ToModelEntry()
 	entryModel.UserID = &integrationutils.DefaultUser.ID
-	entryDtoJson := getJsonData(t, entryDto)
+	entryDtoJson := getJsonDataEntry(t, entryDto)
 
 	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(entryDtoJson))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -120,7 +120,7 @@ func (s *EntryTestIntegrationSuite) TestUpdateEntry(t provider.T) {
 
 	entryModel := entryDto.ToModelEntry()
 	entryModel.UserID = &integrationutils.DefaultUser.ID
-	entryDtoJson := getJsonData(t, entryDto)
+	entryDtoJson := getJsonDataEntry(t, entryDto)
 
 	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(entryDtoJson))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
