@@ -1,18 +1,19 @@
 package usecase_test
 
 import (
-	"github.com/bxcodec/faker"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/crypto/bcrypt"
 	"strconv"
 	"testing"
 	authMocks "timetracker/internal/Auth/repository/mocks"
 	authUsecase "timetracker/internal/Auth/usecase"
 	userMocks "timetracker/internal/User/repository/mocks"
 	"timetracker/models"
+
+	"github.com/bxcodec/faker"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type TestCaseSignUp struct {

@@ -1,7 +1,6 @@
 .PHONY: test start-docker integration-test test-allure clean
-test:
-	go clean -testcache
-	cd internal && go test $$(go list ./... | grep -v /mocks) -test_dsn="host=localhost user=test password=test database=postgres port=13081" -cover
+unit-test:
+	cd internal && go test ./...
 
 test-allure: clean
 	sh allure_test_report.sh
@@ -11,13 +10,13 @@ test-allure-shuffle: clean
 	sh allure_test_report_shuffle.sh
 	allure serve allure-results
 
-integration-test-db:
-	docker compose down && docker compose up -d
-	cd test_integration && go test .
+docker-unit-tests:
+	docker build -t docker-tests-img -f tests.Dockerfile . && \
+	docker run -it docker-tests-img go test -v ./internal/...
 
-
-start-docker:
-	docker compose down && docker compose up -d
+docker-integration-tests:
+	docker build -t docker-tests-img -f tests.Dockerfile . && \
+	docker run -it docker-tests-img go test -v ./integration_test/...
 
 integration-test:
 	sh allure_integration_test.sh

@@ -27,19 +27,18 @@ type usecase struct {
 func (u usecase) Auth(cookie string) (*models.User, error) {
 	userIdStr, err := u.authRepository.GetUserByCookie(cookie)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error in func auth.Usecase.Auth")
+		return nil, errors.Wrap(err, "[u.Auth] auth_repo.GetUserByCookie error")
 	}
 
 	userId, err := strconv.ParseUint(userIdStr, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error in func auth.Usecase.Auth")
+		return nil, errors.Wrap(err, "[u.Auth] parse user_id error")
 	}
 
 	gotUser, err := u.userRepository.GetUser(userId)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error in func auth.Usecase.Auth")
+		return nil, errors.Wrap(err, "[u.Auth] user_repo.GetUser error")
 	}
-	gotUser.Password = ""
 
 	return gotUser, nil
 }
