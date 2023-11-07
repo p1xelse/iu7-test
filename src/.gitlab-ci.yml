@@ -11,7 +11,7 @@ unit-test:
   services:
     - docker:dind
   script:
-    - docker build -t $DOCKER_IMAGE_NAME .
+    - docker build -t $DOCKER_IMAGE_NAME -f tests.Dockerfile .
     - docker run $DOCKER_IMAGE_NAME go test -v ./internal/...
 integration-test:
   stage: integration-test
@@ -19,7 +19,12 @@ integration-test:
   services:
     - docker:dind
   script:
-    - docker build -t $DOCKER_IMAGE_NAME .
+    - docker build -t $DOCKER_IMAGE_NAME -f tests.Dockerfile .
     - docker run $DOCKER_IMAGE_NAME go test -v ./integration_test/...
   needs:
     - job: unit-test
+
+rules:
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    changes:
+      - '**/*'  # Следить за всеми изменениями в репозитории, чтобы запускать пайплайн при любом пуше в мерж-реквесте
