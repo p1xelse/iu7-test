@@ -6,7 +6,7 @@
 
 
 [postgres-client]
-    dsn = 'host=localhost user=test password=test database=postgres port=13081'
+    dsn = 'host=test_postgres user=test password=test database=postgres port=5432'
     max-open-connections = 10
     conn-lifetime = '3m0s'
 [server]
@@ -15,9 +15,9 @@
     read-header-timeout = '30s'
     write-timeout = '30s'
 [redis-client]
-    addr =':6379'
+    addr ='redis-session:6379'
     password = 'ws_redis_password'
 
 [redis-project-storage-client]
-    addr =':6380'
+    addr ='redis-cache:6379'
     password = 'ws_redis_password'
