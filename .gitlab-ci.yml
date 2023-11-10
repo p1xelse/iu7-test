@@ -1,0 +1,53 @@
+stages:
+  # - unit-test
+  # - integration-test
+  - e2e-test
+
+variables:
+  DOCKER_IMAGE_NAME: docker-test-image
+
+# unit-test:
+#   stage: unit-test
+#   image: docker:latest
+#   services:
+#     - docker:dind
+#   before_script:
+#     - docker info
+#     - ls
+#   script:
+#     - cd src && docker build -t $DOCKER_IMAGE_NAME -f tests.Dockerfile .
+#     - docker run $DOCKER_IMAGE_NAME go test -v ./internal/...
+
+# integration-test:
+#   stage: integration-test
+#   image: docker:latest
+#   services:
+#     - docker:dind
+#   script:
+#     - cd src && docker build -t $DOCKER_IMAGE_NAME -f tests.Dockerfile .
+#     - docker run $DOCKER_IMAGE_NAME go test -v ./integration_test/...
+#   needs:
+#     - job: unit-test
+
+e2e-test:
+  stage: e2e-test
+  image: docker:latest
+  services:
+    - docker:dind  # Запускаем сервис docker:dind с конкретной версией Docker
+  before_script:
+    - docker --version  # Проверяем версию Docker
+    - docker-compose --version  # Проверяем версию Docker Compose
+  script:
+    - cd src  # Укажите путь до вашего проекта
+    - docker-compose up -d  # Поднимаем проект с помощью Docker Compose
+    # - pip install -r requirements.txt  # Устанавливаем зависимости для e2e-тестов, если необходимо
+    - pytest -v e2e-tests/  # Запускаем e2e-тесты с помощью
+  # needs:
+  #   - job: integration-test
+
+workflow:
+  name: '$PROJECT1_PIPELINE_NAME'
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      variables:
+        PROJECT1_PIPELINE_NAME: 'MR pipeline: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME'
