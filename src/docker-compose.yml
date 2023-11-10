@@ -32,16 +32,16 @@ services:
       - "6380:6379"
     networks:
       - mynetwork
-  # app:
-  #   build: .
-  #   container_name: app
-  #   restart: always
-  #   depends_on: 
-  #     - test_postgres
-  #   ports:
-  #     - "8080:8080"
-  #   networks:
-  #     - mynetwork
+  app:
+    build: .
+    container_name: app
+    restart: always
+    depends_on: 
+      - test_postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - mynetwork
 
 
 networks:

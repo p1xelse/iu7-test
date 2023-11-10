@@ -10,21 +10,46 @@ unit-test:
   image: docker:latest
   services:
     - docker:dind
+  before_script:
+    - docker info
+    - ls
   script:
-    - docker build -t $DOCKER_IMAGE_NAME -f tests.Dockerfile .
+    - cd src && docker build -t $DOCKER_IMAGE_NAME -f tests.Dockerfile .
     - docker run $DOCKER_IMAGE_NAME go test -v ./internal/...
+
 integration-test:
   stage: integration-test
   image: docker:latest
   services:
     - docker:dind
   script:
-    - docker build -t $DOCKER_IMAGE_NAME -f tests.Dockerfile .
+    - cd src && docker build -t $DOCKER_IMAGE_NAME -f tests.Dockerfile .
     - docker run $DOCKER_IMAGE_NAME go test -v ./integration_test/...
   needs:
     - job: unit-test
 
-rules:
-  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    changes:
-      - '**/*'  # Следить за всеми изменениями в репозитории, чтобы запускать пайплайн при любом пуше в мерж-реквесте
+e2e-test:
+  stage: e2e-test
+  image: python:3.8  # Используем образ Python для запуска pytest
+  services:
+    - docker:dind  # Запускаем сервис docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375  # Указываем хост Docker внутри контейнера
+  before_script:
+    - apk update  # Обновляем пакеты
+    - apk add docker-compose  # Устанавливаем docker-compose
+    - docker info
+  script:
+    - cd src  # Укажите путь до вашего проекта
+    - docker-compose up -d  # Поднимаем проект с помощью Docker Compose
+    # - pip install -r requirements.txt  # Устанавливаем зависимости для e2e-тестов, если необходимо
+    - pytest -v e2e-tests/  # Запускаем e2e-тесты с помощью pytest
+  needs:
+    - job: integration-test
+
+workflow:
+  name: '$PROJECT1_PIPELINE_NAME'
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      variables:
+        PROJECT1_PIPELINE_NAME: 'MR pipeline: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME'
